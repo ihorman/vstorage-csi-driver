@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: vstorage-csi-node
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: vstorage-csi-node
+  template:
+    metadata:
+      labels:
+        app: vstorage-csi-node
+    spec:
+      serviceAccountName: virtuozzostorage-csi-node-sa
+      containers:
+        - name: csi-node-driver
+          image: ihorman/vstorage-csi:latest
+          volumeMounts:
+            - mountPath: /csi
+              name: socket-dir
+        - name: csi-node-driver-registrar
+          image: k8s.gcr.io/sig-storage/csi-node-driver-registrar:v2.3.0
+          args:
+            - "--csi-address=/csi/csi.sock"
+            - "--kubelet-registration-path=/var/lib/kubelet/plugins/virtuozzostorage-csi/csi.sock"
+          volumeMounts:
+            - mountPath: /csi
+              name: socket-dir
+            - mountPath: /registration
+              name: registration-dir
+        - name: csi-external-provisioner
+          image: k8s.gcr.io/sig-storage/csi-provisioner:v3.0.0
+          args:
+            - "--csi-address=/csi/csi.sock"
+            - "--v=5"
+          volumeMounts:
+            - name: socket-dir
+              mountPath: /csi
+      volumes:
+        - name: socket-dir
+          hostPath:
+            path: /var/lib/kubelet/plugins/virtuozzostorage-csi
+            type: DirectoryOrCreate
+        - name: registration-dir
+          hostPath:
+            path: /var/lib/kubelet/plugins_registry/
+            type: Directory
+
