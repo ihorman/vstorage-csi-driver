@@ -48,4 +48,7 @@ spec:
           hostPath:
             path: /var/lib/kubelet/plugins_registry/
             type: Directory
-
+        - name: pstorage
+          hostPath:
+            path: /pstorage
+            type: Directory
