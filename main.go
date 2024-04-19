@@ -45,14 +45,14 @@ func (d *virtuozzoStorageDriver) CreateVolume(ctx context.Context, req *csi.Crea
 
 	fmt.Printf("Creating volume with ID %s at path %s\n", volumeID, volumePath)
 
-	#if err := os.MkdirAll(volumePath, 0755); err != nil {
-	#	fmt.Printf("Error creating volume directory: %v\n", err)
-	#	return nil, status.Errorf(codes.Internal, "failed to create volume directory: %v", err)
-	#}
-    cmd, err := exec.Command("/usr/sbin/ploop", "init" "-s 1G", string(volumePath))
-	    if (err != nil) {
-		    fmt.Println(err)
-	    return
+	if err := os.MkdirAll(volumePath, 0755); err != nil {
+		fmt.Printf("Error creating volume directory: %v\n", err)
+		return nil, status.Errorf(codes.Internal, "failed to create volume directory: %v", err)
+	}
+    #cmd, err := exec.Command("/usr/sbin/ploop", "init" "-s 1G", string(volumePath))
+	#    if (err != nil) {
+	#	    fmt.Println(err)
+	#    return
 				  }
 	cmd.Close()
 
